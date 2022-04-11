@@ -10,6 +10,7 @@ var stringifyJSON = function(obj) {
   if (typeof obj === 'number') {
     // concat toString value
     result += obj.toString();
+    return result;
   }
   if (obj === null) {
     return 'null';
@@ -19,21 +20,44 @@ var stringifyJSON = function(obj) {
 
   // if object is a string then concat to result
     // return result var
-  if (typeof obj === 'string') {return result.concat('"' + obj + '"');}
+  if (typeof obj === 'string') {
+    return '"' + obj + '"';
+  }
 
   // if object is an array
   if (Array.isArray(obj)) {
-        // iterate over array
+    // create var container
+    var container = '';
+    // iterate over array
     for (var i = 0; i < obj.length; i++) {
-      obj[i]
+      container += stringifyJSON(obj[i]);
+      if (i < obj.length - 1) {
+        container += ',';
+      }
     }
+    return '[' + container + ']';
+  } else if (typeof obj === 'object') {
+    var container = '';
+    //console.log(JSON.stringify( {'foo': true, 'bar': false, 'baz': null}))
+    for (var key in obj) {
+      var stringKey = stringifyJSON(key);
+      var stringValue = stringifyJSON(obj[key]);
+      if (typeof obj[key] === 'function' || typeof obj[key] === 'undefined') {
+        return '{}';
+      }
+      container += stringKey + ':' + stringValue + ',';
+      console.log(container);
+    }
+    return '{' + container.substr(0, container.length -1) + '}';
   }
 
       // sent current index thru main function
   // otherwise, if typeof obj is object
     // for each key/value? in obj thru main function
-  return result;
+  //return '{}';
 };
+
+// LAST TEST: expected '{"functions":{},"undefined":{}}' to equal '{}'
 
 '[a, b, c]'
 '{key: value}'
